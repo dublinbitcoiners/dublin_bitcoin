@@ -13,7 +13,7 @@
   --dublin-blue-dark: #08345f;
   --bitcoin: #f7931a;
   --max: 1280px;
-  --section-y: clamp(5.25rem, 10vw, 10.5rem);
+  --section-y: clamp(3rem, 6vw, 5.5rem);
   font-family:
     "Inter",
     ui-sans-serif,
@@ -140,7 +140,7 @@ nav a:focus-visible {
 
 .section-rule {
   border-top: 1px solid var(--line);
-  padding-top: clamp(3rem, 6vw, 5.25rem);
+  padding-top: clamp(2.25rem, 4vw, 3.75rem);
 }
 
 .eyebrow,
@@ -224,9 +224,9 @@ h3 {
 }
 
 .hero {
-  min-height: calc(100svh - 5.1rem);
+  min-height: calc(82svh - 5.1rem);
   display: grid;
-  align-items: center;
+  align-items: start;
   overflow: hidden;
 }
 
@@ -235,7 +235,7 @@ h3 {
   grid-template-columns: minmax(0, 0.95fr) minmax(22rem, 0.85fr);
   gap: clamp(3rem, 7vw, 6rem);
   align-items: center;
-  padding-block: clamp(4rem, 7vw, 7rem);
+  padding-block: clamp(2.25rem, 4vw, 4rem) clamp(3rem, 5vw, 5rem);
 }
 
 .hero-copy {
@@ -313,53 +313,7 @@ h3 {
 
 .meetup-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(18rem, 1fr);
-  gap: clamp(2.5rem, 6vw, 5rem);
-  align-items: center;
-}
-
-.meetup-art {
-  position: relative;
-  aspect-ratio: 4 / 3;
-  overflow: hidden;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.18) 0 1px, transparent 1px 100%),
-    linear-gradient(135deg, var(--dublin-blue) 0%, var(--dublin-blue-dark) 72%);
-  background-size:
-    100% 26%,
-    100% 100%;
-}
-
-.meetup-art::before,
-.meetup-art::after {
-  position: absolute;
-}
-
-.meetup-art::before {
-  content: "";
-  left: 10%;
-  right: 10%;
-  bottom: 28%;
-  height: 24%;
-  border: 0.7rem solid rgba(255, 255, 255, 0.78);
-  border-bottom: 0;
-  border-radius: 999px 999px 0 0;
-  box-shadow:
-    0 2.8rem 0 -2rem rgba(255, 255, 255, 0.78),
-    0 5.2rem 0 -2.2rem rgba(247, 147, 26, 0.9);
-}
-
-.meetup-art::after {
-  content: "DB";
-  inset: 0;
-  display: grid;
-  place-items: center;
-  color: rgba(255, 255, 255, 0.9);
-  font-family: "Fraunces", Georgia, serif;
-  font-size: clamp(5rem, 13vw, 10rem);
-  font-weight: 700;
-  line-height: 1;
-  text-shadow: 0 0.12em 0 rgba(8, 52, 95, 0.28);
+  grid-template-columns: minmax(0, 46rem);
 }
 
 .meetup-details {
