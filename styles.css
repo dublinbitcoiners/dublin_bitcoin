@@ -6,18 +6,21 @@
   --surface: #f3f6fa;
   --text: #0c1f37;
   --muted: #66758a;
-  --soft: #9aa7b5;
   --line: #dce3eb;
   --accent: #1f6fd6;
   --accent-strong: #0f58b8;
   --dublin-blue: #0f5fa8;
   --dublin-blue-dark: #08345f;
-  --dublin-blue-soft: #dcecf8;
   --bitcoin: #f7931a;
-  --bitcoin-dark: #3d2606;
   --max: 1280px;
   --section-y: clamp(5.25rem, 10vw, 10.5rem);
-  font-family: "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+  font-family:
+    "Inter",
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
     sans-serif;
 }
 
@@ -49,21 +52,21 @@ p {
   line-height: 1.7;
 }
 
-code {
-  border: 1px solid var(--line);
-  background: var(--surface);
-  padding: 0.08rem 0.28rem;
-  font-size: 0.9em;
+ul {
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
+li {
+  margin-block: 0.45rem;
+  color: var(--muted);
+  line-height: 1.7;
 }
 
 .site-header {
   position: sticky;
   top: 0;
   z-index: 20;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1.25rem;
   width: 100%;
   padding: 1.25rem clamp(1.5rem, 4vw, 4rem);
   background: rgba(255, 255, 255, 0.92);
@@ -72,7 +75,11 @@ code {
 }
 
 .site-header-inner {
-  display: contents;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  width: 100%;
 }
 
 .brand {
@@ -81,6 +88,7 @@ code {
   gap: 0.75rem;
   font-weight: 600;
   color: var(--text);
+  white-space: nowrap;
 }
 
 .brand-mark {
@@ -109,6 +117,7 @@ nav a {
   font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
 nav a:hover,
@@ -316,7 +325,9 @@ h3 {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.18) 0 1px, transparent 1px 100%),
     linear-gradient(135deg, var(--dublin-blue) 0%, var(--dublin-blue-dark) 72%);
-  background-size: 100% 26%, 100% 100%;
+  background-size:
+    100% 26%,
+    100% 100%;
 }
 
 .meetup-art::before,
@@ -412,22 +423,6 @@ h3 {
   font-size: clamp(2.25rem, 4vw, 4rem);
 }
 
-.text-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  color: var(--muted);
-  font-size: 0.76rem;
-  font-weight: 600;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-}
-
-.text-link:hover,
-.text-link:focus-visible {
-  color: var(--accent);
-}
-
 .presentation-grid {
   display: grid;
   border-block: 1px solid var(--line);
@@ -466,11 +461,6 @@ h3 {
 
 .presentation-card p {
   max-width: 44rem;
-}
-
-.presentation-card footer {
-  display: grid;
-  gap: 1rem;
 }
 
 .presentation-details {
@@ -531,6 +521,10 @@ h3 {
   color: var(--accent);
 }
 
+.copyright {
+  margin-top: 3rem;
+}
+
 .deck {
   max-width: 960px;
   margin: 0 auto;
@@ -552,22 +546,27 @@ h3 {
 
 .deck-content {
   display: grid;
-  gap: 1.5rem;
+  gap: 2rem;
 }
 
-.deck-content :global(h2) {
+.deck-content h2 {
+  max-width: 100%;
   border-top: 1px solid var(--line);
   padding-top: 2rem;
   font-size: clamp(1.8rem, 3vw, 3rem);
 }
 
-.deck-content :global(ul) {
-  color: var(--muted);
-  line-height: 1.7;
+.deck-content section:first-child h2 {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.deck-content h2 + ul {
+  margin-top: 1rem;
 }
 
 @media (max-width: 920px) {
-  .site-header {
+  .site-header-inner {
     align-items: flex-start;
     flex-direction: column;
   }
@@ -612,11 +611,8 @@ h3 {
   }
 
   .presentation-heading {
-    grid-template-columns: 1fr;
-  }
-
-  .presentation-heading {
     display: grid;
+    grid-template-columns: 1fr;
   }
 
   .button {

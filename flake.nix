@@ -14,13 +14,12 @@
       {
         devShells.default = pkgs.mkShell {
           packages = [
-            pkgs.nodejs
+            pkgs.python3
           ];
 
           shellHook = ''
             echo "Dublin Bitcoin site"
-            echo "  npm install"
-            echo "  npm run dev"
+            echo "  python3 -m http.server 4321"
           '';
         };
       });

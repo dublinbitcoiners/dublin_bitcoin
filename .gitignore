@@ -1,6 +1,4 @@
-node_modules/
-dist/
-.astro/
 .direnv/
+_site/
 result
 *.log

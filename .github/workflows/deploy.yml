@@ -22,18 +22,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build
-        run: npm run build
-        env:
-          ASTRO_BASE: /
+      - name: Prepare static site
+        run: |
+          mkdir _site
+          cp CNAME index.html styles.css _site/
+          mkdir _site/dublin_bitcoin_pres
+          cp dublin_bitcoin_pres/*.html _site/dublin_bitcoin_pres/
+          cp -R presentations _site/
+          touch _site/.nojekyll
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -41,7 +37,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./dist
+          path: ./_site
 
   deploy:
     environment:
