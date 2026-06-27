@@ -27,6 +27,63 @@
 
     <main>
       <section class="hero">
+        <svg
+          class="hero-skyline"
+          viewBox="0 0 1200 240"
+          preserveAspectRatio="xMidYMax meet"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <!-- ground line -->
+          <path d="M0 212 H1200" />
+          <!-- Georgian terrace + chimneys (left) -->
+          <path
+            d="M4 212 V150 H42 V162 H78 V150 H116 V162 H154 V150 H174 V212
+               M18 150 V133 H32 V150
+               M96 162 V149 H110 V162
+               M132 150 V136 H144 V150"
+          />
+          <!-- Ha'penny Bridge -->
+          <path d="M188 198 H344 M192 198 Q266 150 340 198" />
+          <path d="M224 198 V178 M266 198 V174 M308 198 V178" />
+          <circle cx="224" cy="175" r="3" />
+          <circle cx="266" cy="171" r="3" />
+          <circle cx="308" cy="175" r="3" />
+          <!-- Cathedral spire (St Patrick's) -->
+          <path
+            d="M360 212 V104 H414 V212
+               M356 104 L387 40 L418 104
+               M356 104 L360 92 L364 104
+               M410 104 L414 92 L418 104
+               M387 40 V30 M381 36 H393"
+          />
+          <!-- The Spire of Dublin -->
+          <path d="M538 212 L540 26 L542 212" />
+          <circle cx="540" cy="24" r="2.5" />
+          <!-- Liberty Hall -->
+          <path
+            d="M618 212 V74 H678 V212
+               M612 74 H684 V63 H612 Z
+               M618 92 H678 M618 110 H678 M618 128 H678
+               M618 146 H678 M618 164 H678 M618 182 H678 M618 200 H678"
+          />
+          <!-- Samuel Beckett Bridge (the harp) -->
+          <path d="M762 200 H986" />
+          <path d="M784 206 Q802 118 842 54" />
+          <path
+            d="M842 54 L788 198
+               M842 54 L980 198
+               M838 82 L944 198
+               M830 116 L902 198
+               M818 156 L868 198"
+          />
+          <!-- Convention Centre (the tilted drum) -->
+          <path
+            d="M1016 212 L1030 96 M1100 92 L1108 212
+               M1030 96 Q1064 80 1100 92
+               M1052 99 L1060 212 M1080 96 L1086 212"
+          />
+        </svg>
         <div class="hero-inner">
           <div class="hero-copy">
             <p class="eyebrow">Bitcoin only / Dublin city centre</p>
@@ -73,7 +130,7 @@
         </div>
       </section>
 
-      <section class="section" id="meetups">
+      <section class="section">
         <div class="section-rule split">
           <p class="eyebrow">Bitcoin only</p>
           <div class="split-copy">
@@ -87,7 +144,7 @@
         </div>
       </section>
 
-      <section class="section">
+      <section class="section" id="meetups">
         <div class="section-rule meetup-grid">
           <div class="meetup-details">
             <p class="eyebrow">Proof of work</p>
@@ -160,11 +217,9 @@
           </div>
           <div class="presentation-grid">
             <article class="presentation-card">
-              <div>
-                <h3>
-                  <a href="dublin_bitcoin_pres/agentic_payments.html">Bitcoin for Agentic Payments</a>
-                </h3>
-              </div>
+              <h3>
+                <a href="dublin_bitcoin_pres/agentic_payments.html">Bitcoin for Agentic Payments</a>
+              </h3>
               <div class="presentation-details">
                 <p class="meta">Dublin Bitcoin</p>
                 <p>
@@ -181,11 +236,9 @@
             </article>
 
             <article class="presentation-card">
-              <div>
-                <h3>
-                  <a href="dublin_bitcoin_pres/ark.html">Ark: Bitcoin's Shared UTXO Layer</a>
-                </h3>
-              </div>
+              <h3>
+                <a href="dublin_bitcoin_pres/ark.html">Ark: Bitcoin's Shared UTXO Layer</a>
+              </h3>
               <div class="presentation-details">
                 <p class="meta">Dublin Bitcoin</p>
                 <p>
@@ -202,11 +255,9 @@
             </article>
 
             <article class="presentation-card">
-              <div>
-                <h3>
-                  <a href="dublin_bitcoin_pres/ecash.html">Ecash &amp; Cashu: Scaling Bitcoin Privacy</a>
-                </h3>
-              </div>
+              <h3>
+                <a href="dublin_bitcoin_pres/ecash.html">Ecash &amp; Cashu: Scaling Bitcoin Privacy</a>
+              </h3>
               <div class="presentation-details">
                 <p class="meta">Dublin Bitcoin</p>
                 <p>
@@ -223,11 +274,9 @@
             </article>
 
             <article class="presentation-card">
-              <div>
-                <h3>
-                  <a href="presentations/self-custody-basics/">Self-Custody Basics</a>
-                </h3>
-              </div>
+              <h3>
+                <a href="presentations/self-custody-basics/">Self-Custody Basics</a>
+              </h3>
               <div class="presentation-details">
                 <p class="meta">Dublin Bitcoin</p>
                 <p>
@@ -244,9 +293,9 @@
             </article>
 
             <article class="presentation-card">
-              <div>
-                <h3>Lightning Payments</h3>
-              </div>
+              <h3>
+                <a href="presentations/lightning-payments.pdf">Lightning Payments</a>
+              </h3>
               <div class="presentation-details">
                 <p class="meta">Dublin Bitcoin</p>
                 <p>
@@ -257,13 +306,14 @@
                   <span>lightning</span>
                   <span>payments</span>
                 </div>
+                <a class="card-action" href="presentations/lightning-payments.pdf">Download PDF</a>
               </div>
             </article>
 
             <article class="presentation-card">
-              <div>
-                <h3>Running a Bitcoin Node</h3>
-              </div>
+              <h3>
+                <a href="presentations/sample-html-deck/">Running a Bitcoin Node</a>
+              </h3>
               <div class="presentation-details">
                 <p class="meta">Dublin Bitcoin</p>
                 <p>
@@ -274,6 +324,7 @@
                   <span>nodes</span>
                   <span>infrastructure</span>
                 </div>
+                <a class="card-action" href="presentations/sample-html-deck/">View deck</a>
               </div>
             </article>
           </div>
