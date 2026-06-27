@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bitcoin for Agentic Payments</title>
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #1a1a1a;
+            --accent-color: #ff9900; /* Bitcoin Orange */
+            --secondary-color: #008080; /* AI Teal */
+            --code-bg: #f5f5f5;
+            --slide-padding: 3rem;
+            --slide-max-width: 1400px;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        /* Slide Container */
+        .presentation {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        /* Individual Slide */
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none; /* Hidden by default */
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: var(--slide-padding);
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        .slide.active {
+            display: flex;
+        }
+
+        /* Typography */
+        h1 {
+            font-size: 4rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-color);
+        }
+
+        h2 {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            color: var(--secondary-color);
+        }
+
+        h3 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            color: var(--text-color);
+        }
+
+        p, li {
+            font-size: 1.4rem;
+            line-height: 1.5;
+            color: #4a4a4a;
+            max-width: 1100px;
+        }
+
+        ul {
+            text-align: left;
+            padding-left: 2rem;
+            margin-top: 0;
+        }
+
+        li {
+            margin-bottom: 0.6rem;
+        }
+
+        /* Code Blocks */
+        pre {
+            background-color: var(--code-bg);
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: left;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 1.1rem;
+            overflow-x: auto;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            max-width: 90%;
+            width: 100%;
+        }
+
+        code {
+            font-family: inherit;
+            color: #008080;
+        }
+
+        pre code {
+            color: #333;
+        }
+        
+        .code-highlight {
+            color: #ff9900;
+            font-weight: bold;
+        }
+
+        /* Custom Classes */
+        .title-slide h1 {
+            font-size: 5rem;
+            color: var(--text-color);
+            margin-bottom: 0.2em;
+        }
+        
+        .title-slide h2 {
+            color: var(--accent-color);
+            font-weight: normal;
+        }
+
+        .accent {
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+
+        .secondary {
+            color: var(--secondary-color);
+            font-weight: bold;
+        }
+
+        .columns {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 3rem;
+            width: 100%;
+            max-width: var(--slide-max-width);
+        }
+
+        .column {
+            flex: 1;
+            text-align: left;
+        }
+        
+        .column h3 {
+            text-align: center;
+        }
+
+        .card {
+            background: #fff;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 1px solid #eee;
+            height: 100%;
+        }
+
+        .diagram-box {
+            border: 2px dashed #ccc;
+            padding: 1.5rem;
+            border-radius: 8px;
+            background: #fafafa;
+            margin: 1rem 0;
+            font-family: monospace;
+            white-space: pre;
+            text-align: center;
+            font-size: 1.1rem;
+            line-height: 1.3;
+        }
+
+        .alert-box {
+            background-color: #fff3cd;
+            border-left: 6px solid #ffc107;
+            padding: 1rem 2rem;
+            margin: 2rem 0;
+            text-align: left;
+            border-radius: 4px;
+        }
+
+        .info-box {
+            background-color: #e0f7fa;
+            border-left: 6px solid var(--secondary-color);
+            padding: 1rem 2rem;
+            margin: 2rem 0;
+            text-align: left;
+            border-radius: 4px;
+        }
+
+        .center-text { text-align: center; }
+
+        /* Navigation Controls */
+        .controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            color: #888;
+            background: rgba(255,255,255,0.9);
+            padding: 5px 10px;
+            border-radius: 4px;
+            pointer-events: none;
+        }
+
+        .progress {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            height: 5px;
+            background: var(--accent-color);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* Footer */
+        .footer {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            font-size: 1rem;
+            color: #999;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+
+<div class="presentation">
+
+    <!-- Slide 1: Title -->
+    <div class="slide title-slide active">
+        <h1>Bitcoin for Agentic Payments</h1>
+        <h2>The Economy of Machines Paying Machines</h2>
+        <br>
+        <p><strong>thesimplekid</strong></p>
+    </div>
+
+    <!-- Slide 2: The Problem -->
+    <div class="slide">
+        <h2>Legacy Rails Break Down for Machines</h2>
+        <p>Why can't an AI agent just use a credit card?</p>
+        <div class="columns" style="margin-top: 2rem;">
+            <div class="column card">
+                <h3 class="secondary">1. Identity & KYC</h3>
+                <p>Fiat networks are tied to human identity. Agents do not have passports, utility bills, or bank accounts to pass KYC protocols and sign up for Stripe.</p>
+            </div>
+            <div class="column card">
+                <h3 class="secondary">2. Chargebacks & Finality</h3>
+                <p>Credit cards have chargeback windows. To safely automate API access and atomic swaps across the globe, agents require <strong>instant, irreversible finality</strong>.</p>
+            </div>
+            <div class="column card">
+                <h3 class="secondary">3. Perfect Privacy</h3>
+                <p>When an agent executes thousands of micro-transactions, it leaves a massive, trackable data trail exposing strategy and user data.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 3: The Solution -->
+    <div class="slide">
+        <h2>The Solution: Bearer Assets & Micropayments</h2>
+        <p>Bitcoin and the Lightning Network act as the native, permissionless currency of AI.</p>
+        
+        <div class="info-box" style="max-width: 900px; margin: 3rem auto;">
+            <ul>
+                <li><strong>Permissionless:</strong> Any machine can generate a private key and start transacting immediately.</li>
+                <li><strong>Micro-scale:</strong> Settle transactions fractions of a cent in real-time.</li>
+                <li><strong>Final:</strong> No chargeback fraud means providers can deliver data to anonymous agents instantly.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Slide 4: HTTP 402 History -->
+    <div class="slide">
+        <h2>HTTP 402: A 30-Year Promise</h2>
+        <p>The <code>402 Payment Required</code> status code was reserved in the original HTTP spec in the 1990s.</p>
+        
+        <div class="info-box" style="max-width: 900px; margin: 3rem auto;">
+            <ul>
+                <li><strong>1990s:</strong> Web pioneers foresaw micropayments, but no native digital cash existed. The code sat unused.</li>
+                <li><strong>2000s-2010s:</strong> E-commerce centralized around credit cards, API keys, and subscriptions.</li>
+                <li><strong>Today:</strong> AI agents need programmatic, stateless payments. The 30-year-old standard finally has its missing piece: <strong>Bitcoin</strong>.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Slide 5: MPP and L402 -->
+    <div class="slide">
+        <h2>How It's Being Used Now</h2>
+        <p>Standards like <strong>L402</strong> and the <strong>Machine Payments Protocol (MPP)</strong> bring 402 to life.</p>
+        
+        <div class="card" style="margin-top: 1rem; border-color: var(--accent-color); width: 100%; max-width: 1100px;">
+            <h3 style="margin-bottom: 0;">MPP Lightning "Charge" Intent</h3>
+            <div class="diagram-box" style="text-align: left; font-size: 1rem; line-height: 1.4; padding: 1.5rem; display: inline-block;">
+<strong>Client</strong>                         <strong>Server</strong>                    <strong>Lightning Network</strong>
+  |                              |                              |
+  | 1. GET /resource             |                              |
+  | ---------------------------&gt; |                              |
+  |                              | 2. Create invoice            |
+  |                              | ---------------------------&gt; |
+  |                              | 3. invoice, hash             |
+  |                              | &lt;--------------------------- |
+  | 4. 402 Payment Required      |                              |
+  |    (invoice, hash)           |                              |
+  | &lt;--------------------------- |                              |
+  |                              |                              |
+  | 5. Pay invoice               |                              |
+  | ----------------------------------------------------------&gt; |
+  | 6. Preimage (HTLC)           |                              |
+  | &lt;---------------------------------------------------------- |
+  |                              |                              |
+  | 7. GET /resource             |                              |
+  |    credential: preimage      |                              |
+  | ---------------------------&gt; |                              |
+  |                              |                              |
+  | 8. 200 OK (resource)         |                              |
+  | &lt;--------------------------- |                              |
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 6: Ecash for Agents (NUT-24) -->
+    <div class="slide">
+        <h2>Ecash for Agents (NUT-24)</h2>
+        <p>Ecash (Cashu) tokens are perfect for agents: stateless, instantly verifiable, perfect privacy, and no routing failures.</p>
+        
+        <div class="columns">
+            <div class="column">
+                <h3>NUT-24: Cashu HTTP 402</h3>
+                <ul>
+                    <li>A server responds with <code>402</code> and an <code>X-Cashu</code> header.</li>
+                    <li>The header defines the <strong>amount</strong>, <strong>unit</strong>, and <strong>acceptable mints</strong>.</li>
+                    <li>The agent simply resends the request with a valid Cashu token in its own <code>X-Cashu</code> header.</li>
+                </ul>
+            </div>
+            <div class="column">
+                <div class="diagram-box" style="text-align: left; font-size: 1rem;">
+<span style="color: #888;">// Server: We need 10 sats from Mint A or B</span>
+402 Payment Required
+X-Cashu: {"a": 10, "u": "sat", "m": ["https://mintA.com"]}
+
+<span style="color: #888;">// Agent: Here is the token.</span>
+GET /api/data
+X-Cashu: cashuAeyJ0b2tlbiI6W3sibWl...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 7: The Ecosystem: 402index.io -->
+    <div class="slide">
+        <h2>The Ecosystem: <a href="https://402index.io" target="_blank" style="color: inherit; text-decoration: none;">402index.io</a></h2>
+        <p>The directory of paid APIs for AI agents.</p>
+        
+        <div class="card" style="max-width: 900px; width: 100%;">
+            <div style="display: flex; justify-content: space-around; align-items: center; padding: 1rem;">
+                <div class="center-text">
+                    <h1 style="color: var(--secondary-color); margin: 0;">17,765</h1>
+                    <p style="margin-top: 0.5rem;">Endpoints Indexed</p>
+                </div>
+                <div style="width: 2px; height: 80px; background: #eee;"></div>
+                <div class="center-text">
+                    <h1 style="color: var(--accent-color); margin: 0;">7,214</h1>
+                    <p style="margin-top: 0.5rem;">Payment-Verified</p>
+                </div>
+            </div>
+            <p class="center-text" style="font-size: 1.2rem; margin-top: 2rem;">
+                Agents can programmatically search via <strong>MCP (Model Context Protocol)</strong> to find services on <a href="https://402index.io" target="_blank" style="color: inherit;">402index.io</a>, negotiate prices, and pay on the fly.
+            </p>
+        </div>
+    </div>
+
+    <!-- Slide 8: Live Demos & Implementations -->
+    <div class="slide">
+        <h2>Real-World Implementations</h2>
+        
+        <div class="columns" style="margin-top: 2rem;">
+            <div class="column card" style="border-top: 6px solid var(--secondary-color);">
+                <h3 class="secondary"><a href="https://openclaw.com" target="_blank" style="color: inherit; text-decoration: none;">OpenClaw</a> & <a href="https://athenut.com" target="_blank" style="color: inherit; text-decoration: none;">Athenut</a></h3>
+                <p>Open agents negotiating and paying across MPP and xCashu standards dynamically.</p>
+                <ul>
+                    <li>Seamlessly handle 402 challenges.</li>
+                    <li>Pay for exactly what they use.</li>
+                    <li>No subscriptions or manual API key management.</li>
+                </ul>
+            </div>
+            
+            <div class="column card" style="border-top: 6px solid var(--accent-color);">
+                <h3 class="accent"><a href="https://www.routstr.com/" target="_blank" style="color: inherit; text-decoration: none;">Routstr</a></h3>
+                <p>A decentralized AI inference router.</p>
+                <ul>
+                    <li>Pay-per-request API for LLM generation.</li>
+                    <li>Uses Cashu eCash as the API key.</li>
+                    <li>Drop-in replacement for OpenAI SDKs without vendor lock-in.</li>
+                </ul>
+            </div>
+            
+            <div class="column card" style="border-top: 6px solid #4a4a4a;">
+                <h3 style="color: #4a4a4a;"><a href="https://unhuman.domains" target="_blank" style="color: inherit; text-decoration: none;">unhuman.domains</a></h3>
+                <p>The domain registrar built specifically for agents.</p>
+                <ul>
+                    <li>Search, register, and manage via API.</li>
+                    <li>Pay with Bitcoin Lightning (L402 flow).</li>
+                    <li>Uses <code>agent-wallet</code> for autonomous settlement.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 9: Agent Wallet Architecture -->
+    <div class="slide">
+        <h2>Agent Wallet Architecture</h2>
+        <p>How does the agent actually hold funds and sign payments?</p>
+        
+        <div class="columns">
+            <div class="column">
+                <h3>The Tech Stack</h3>
+                <ul>
+                    <li><strong>NWC (Nostr Wallet Connect):</strong> Standardized protocol for apps to command remote Lightning wallets.</li>
+                    <li><strong>CDK (Cashu Dev Kit):</strong> Embeddable Rust/JS/Python libraries to manage ecash directly in the agent's memory.</li>
+                    <li><strong>agent-wallet:</strong> Self-custodial Bitcoin Lightning wallet daemon explicitly built for AI agents.</li>
+                    <li><strong>mppx SDK:</strong> Client libraries to auto-intercept and fulfill MPP HTTP 402 responses.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 10: Code Example (JavaScript) -->
+    <div class="slide">
+        <h2>Agent Implementation (JS)</h2>
+        <p>A simple wrapper to intercept 402s and pay via Cashu NUT-24</p>
+        <pre><code><span class="code-highlight">async function</span> fetchPaidResource(url, wallet) {
+    <span class="code-highlight">let</span> response = <span class="code-highlight">await</span> fetch(url);
+
+    <span class="code-highlight">if</span> (response.status === 402) {
+        <span style="color: #888;">// 1. Read the payment challenge</span>
+        <span class="code-highlight">const</span> cashuReq = response.headers.get(<span style="color: #d63384;">'X-Cashu'</span>);
+        <span class="code-highlight">const</span> requestDetails = JSON.parse(cashuReq);
+
+        <span style="color: #888;">// 2. Agent wallet autonomously mints/selects tokens</span>
+        <span class="code-highlight">const</span> token = <span class="code-highlight">await</span> wallet.getTokens(
+            requestDetails.a, 
+            requestDetails.m
+        );
+
+        <span style="color: #888;">// 3. Retry with payment credential</span>
+        response = <span class="code-highlight">await</span> fetch(url, {
+            headers: { <span style="color: #d63384;">'X-Cashu'</span>: token.serialize() }
+        });
+    }
+    
+    <span class="code-highlight">return</span> response.json();
+}</code></pre>
+    </div>
+
+    <!-- Slide 11: Conclusion -->
+    <div class="slide">
+        <h1>The Future is M2M</h1>
+        <br>
+        <div class="columns">
+            <div class="column center-text">
+                <h3>Protocols to Watch</h3>
+                <p><a href="https://l402.org" class="accent" style="text-decoration: none;">L402 / MPP</a></p>
+                <p><a href="https://cashu.space" class="secondary" style="text-decoration: none;">Cashu NUTS (NUT-24)</a></p>
+            </div>
+            <div class="column center-text">
+                <h3>Explore</h3>
+                <p>Directory: <a href="https://402index.io" target="_blank" style="color: inherit; text-decoration: none;">402index.io</a></p>
+                <p>Inference: <a href="https://www.routstr.com/" target="_blank" style="color: inherit; text-decoration: none;">Routstr</a></p>
+                <p>Domains: <a href="https://unhuman.domains" target="_blank" style="color: inherit; text-decoration: none;">unhuman.domains</a></p>
+            </div>
+        </div>
+        <br>
+        <p style="font-size: 1rem; color: #999;">Arrow Keys to Navigate</p>
+    </div>
+
+</div>
+
+<div class="footer">Bitcoin for Agentic Payments</div>
+<div class="controls">Arrow Keys to Navigate</div>
+<div class="progress" id="progress"></div>
+
+<script>
+    // Navigation Logic
+    const slides = document.querySelectorAll('.slide');
+    const progressBar = document.getElementById('progress');
+    let currentSlide = 0;
+
+    function updateSlide() {
+        slides.forEach((slide, index) => {
+            slide.classList.remove('active');
+            if (index === currentSlide) {
+                slide.classList.add('active');
+            }
+        });
+        // Update Progress Bar
+        const progress = ((currentSlide + 1) / slides.length) * 100;
+        progressBar.style.width = `${progress}%`;
+    }
+
+    function nextSlide() {
+        if (currentSlide < slides.length - 1) {
+            currentSlide++;
+            updateSlide();
+        }
+    }
+
+    function prevSlide() {
+        if (currentSlide > 0) {
+            currentSlide--;
+            updateSlide();
+        }
+    }
+
+    // Keyboard Events
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+            nextSlide();
+        } else if (e.key === 'ArrowLeft') {
+            prevSlide();
+        }
+    });
+
+    // Click Events (optional, right side forward, left side back)
+    document.addEventListener('click', (e) => {
+        // Do not change slides if clicking a link
+        if (e.target.tagName.toLowerCase() === 'a' || e.target.closest('a')) {
+            return;
+        }
+
+        if (e.clientX > window.innerWidth / 2) {
+            nextSlide();
+        } else {
+            prevSlide();
+        }
+    });
+
+    // Initialize
+    updateSlide();
+</script>
+
+</body>
+</html>

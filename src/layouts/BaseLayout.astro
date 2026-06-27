@@ -1,0 +1,60 @@
+---
+import SiteHeader from "../components/SiteHeader.astro";
+import "../styles/global.css";
+
+type Props = {
+  title?: string;
+  description?: string;
+};
+
+const {
+  title = "Dublin Bitcoin",
+  description = "A Dublin community for Bitcoin education, meetups, and practical self-sovereignty.",
+} = Astro.props;
+
+const year = new Date().getFullYear();
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+  </head>
+  <body>
+    <SiteHeader />
+    <main>
+      <slot />
+    </main>
+    <footer class="site-footer">
+      <div class="site-footer-inner">
+        <div class="footer-grid">
+          <div>
+            <h3>Dublin Bitcoin</h3>
+            <p>
+              A Bitcoin-only meetup in Dublin City Centre. Signal over noise,
+              every month.
+            </p>
+          </div>
+          <div>
+            <p class="meta">Connect</p>
+            <p>
+              <a href="https://x.com/DublinBTCMeetUp" target="_blank" rel="noopener noreferrer">
+                @DublinBTCMeetUp
+              </a>
+            </p>
+          </div>
+          <div>
+            <p class="meta">Location</p>
+            <p>The International Bar</p>
+            <p>23 Wicklow Street, Dublin 2</p>
+            <p>Second Saturday &middot; 1:00 PM</p>
+          </div>
+        </div>
+        <p class="meta" style="margin-top: 3rem;">&copy; {year} Dublin Bitcoin Meetup. Bitcoin only.</p>
+      </div>
+    </footer>
+  </body>
+</html>

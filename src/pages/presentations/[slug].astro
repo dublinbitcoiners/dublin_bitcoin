@@ -1,0 +1,29 @@
+---
+import { getCollection, render } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+export async function getStaticPaths() {
+  const presentations = await getCollection("presentations", ({ data }) => data.kind === "html");
+
+  return presentations.map((presentation) => ({
+    params: { slug: presentation.id.replace(/\.mdx?$/, "") },
+    props: { presentation },
+  }));
+}
+
+const { presentation } = Astro.props;
+const { Content } = await render(presentation);
+---
+
+<BaseLayout title={`${presentation.data.title} · Dublin Bitcoin`}>
+  <article class="deck">
+    <header class="deck-header">
+      <p class="meta">{presentation.data.speaker}</p>
+      <h1>{presentation.data.title}</h1>
+      <p>{presentation.data.summary}</p>
+    </header>
+    <div class="deck-content">
+      <Content />
+    </div>
+  </article>
+</BaseLayout>

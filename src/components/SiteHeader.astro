@@ -1,0 +1,20 @@
+---
+const base = import.meta.env.BASE_URL;
+const nav = [
+  { href: base, label: "Home" },
+  { href: `${base}#meetups`, label: "Meetups" },
+  { href: `${base}#resources`, label: "Presentations" },
+];
+---
+
+<header class="site-header">
+  <div class="site-header-inner">
+    <a class="brand" href={base} aria-label="Dublin Bitcoin home">
+      <span class="brand-mark" aria-hidden="true">DB</span>
+      <span>Dublin Bitcoin</span>
+    </a>
+    <nav aria-label="Primary navigation">
+      {nav.map((item) => <a href={item.href}>{item.label}</a>)}
+    </nav>
+  </div>
+</header>

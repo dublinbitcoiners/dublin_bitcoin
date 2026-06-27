@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ark: Bitcoin's Shared UTXO Layer</title>
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #1a1a1a;
+            --accent-color: #ff9900; /* Bitcoin Orange */
+            --secondary-color: #5b4bdb; /* Ark Violet */
+            --code-bg: #f5f5f5;
+            --slide-padding: 3rem;
+            --slide-max-width: 1400px;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        /* Slide Container */
+        .presentation {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        /* Individual Slide */
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none; /* Hidden by default */
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: var(--slide-padding);
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        .slide.active {
+            display: flex;
+        }
+
+        /* Typography */
+        h1 {
+            font-size: 4rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-color);
+        }
+
+        h2 {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            color: var(--secondary-color);
+        }
+
+        h3 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            color: var(--text-color);
+        }
+
+        p, li {
+            font-size: 1.4rem;
+            line-height: 1.5;
+            color: #4a4a4a;
+            max-width: 1100px;
+        }
+
+        ul {
+            text-align: left;
+            padding-left: 2rem;
+            margin-top: 0;
+        }
+
+        li {
+            margin-bottom: 0.6rem;
+        }
+
+        /* Code Blocks */
+        pre {
+            background-color: var(--code-bg);
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: left;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 1.1rem;
+            overflow-x: auto;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            max-width: 90%;
+            width: 100%;
+        }
+
+        code {
+            font-family: inherit;
+            color: var(--secondary-color);
+        }
+
+        pre code {
+            color: #333;
+        }
+
+        .code-highlight {
+            color: #ff9900;
+            font-weight: bold;
+        }
+
+        /* Custom Classes */
+        .title-slide h1 {
+            font-size: 5rem;
+            color: var(--text-color);
+            margin-bottom: 0.2em;
+        }
+
+        .title-slide h2 {
+            color: var(--accent-color);
+            font-weight: normal;
+        }
+
+        .accent {
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+
+        .secondary {
+            color: var(--secondary-color);
+            font-weight: bold;
+        }
+
+        .columns {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 3rem;
+            width: 100%;
+            max-width: var(--slide-max-width);
+        }
+
+        .column {
+            flex: 1;
+            text-align: left;
+        }
+
+        .column h3 {
+            text-align: center;
+        }
+
+        .card {
+            background: #fff;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 1px solid #eee;
+            height: 100%;
+        }
+
+        .diagram-box {
+            border: 2px dashed #ccc;
+            padding: 1.5rem;
+            border-radius: 8px;
+            background: #fafafa;
+            margin: 1rem 0;
+            font-family: monospace;
+            white-space: pre;
+            text-align: center;
+            font-size: 1.1rem;
+            line-height: 1.3;
+        }
+
+        .alert-box {
+            background-color: #fff3cd;
+            border-left: 6px solid #ffc107;
+            padding: 1rem 2rem;
+            margin: 2rem 0;
+            text-align: left;
+            border-radius: 4px;
+        }
+
+        .info-box {
+            background-color: #efecfb;
+            border-left: 6px solid var(--secondary-color);
+            padding: 1rem 2rem;
+            margin: 2rem 0;
+            text-align: left;
+            border-radius: 4px;
+        }
+
+        .center-text { text-align: center; }
+
+        /* Comparison Table */
+        table.compare {
+            border-collapse: collapse;
+            width: 100%;
+            max-width: 1200px;
+            font-size: 1.25rem;
+            margin-top: 1rem;
+        }
+        table.compare th, table.compare td {
+            border: 1px solid #e0e0e0;
+            padding: 1rem 1.25rem;
+            text-align: left;
+            vertical-align: top;
+        }
+        table.compare th {
+            background: #fafafa;
+            font-size: 1.3rem;
+        }
+        table.compare th.ark { color: var(--secondary-color); }
+        table.compare th.ln { color: var(--accent-color); }
+        table.compare td:first-child {
+            font-weight: bold;
+            color: #1a1a1a;
+            background: #fcfcfc;
+        }
+
+        /* Navigation Controls */
+        .controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            color: #888;
+            background: rgba(255,255,255,0.9);
+            padding: 5px 10px;
+            border-radius: 4px;
+            pointer-events: none;
+        }
+
+        .progress {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            height: 5px;
+            background: var(--accent-color);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* Footer */
+        .footer {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            font-size: 1rem;
+            color: #999;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+
+<div class="presentation">
+
+    <!-- Slide 1: Title -->
+    <div class="slide title-slide active">
+        <h1>Ark</h1>
+        <h2>Scaling Bitcoin with Shared UTXOs</h2>
+        <br>
+        <p><strong>thesimplekid</strong></p>
+    </div>
+
+    <!-- Slide 2: What is Ark (high level) -->
+    <div class="slide">
+        <h2>What is Ark?</h2>
+        <p>A <strong>second layer on Bitcoin</strong> for instant, cheap, self-custodial payments &mdash; that works on Bitcoin <em>today</em>, with no soft fork or consensus changes.</p>
+        <div class="info-box" style="max-width: 950px; margin: 2.5rem auto;">
+            <ul>
+                <li><strong>Simple onboarding</strong> &mdash; no channels to open, no inbound liquidity to buy.</li>
+                <li><strong>Instant payments</strong> with low, predictable fees.</li>
+                <li><strong>Full control of your bitcoin</strong> &mdash; you can always exit to the main chain unilaterally.</li>
+                <li><strong>Lightning interoperable</strong> &mdash; send and receive Lightning through the Ark server.</li>
+            </ul>
+        </div>
+        <p style="font-size: 1.1rem; color: #999;">Originally proposed by Burak Keceli in 2023.</p>
+    </div>
+
+    <!-- Slide 3: Why - the Lightning pain point -->
+    <div class="slide">
+        <h2>Why Another Layer 2?</h2>
+        <p>Lightning works, but it pushes hard problems onto every user and wallet.</p>
+        <div class="columns" style="margin-top: 2rem;">
+            <div class="column card">
+                <h3 class="accent">Liquidity</h3>
+                <p>You can only receive what your <strong>inbound capacity</strong> allows. Channels must be funded, balanced, and often purchased up front.</p>
+            </div>
+            <div class="column card">
+                <h3 class="accent">Channel Management</h3>
+                <p>Opening, closing, rebalancing, watching for breaches. Real on-chain cost and complexity per user.</p>
+            </div>
+            <div class="column card">
+                <h3 class="accent">Routing &amp; Online-ness</h3>
+                <p>Payments can fail to route. To receive, you generally need to be <strong>online</strong> and reachable.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 4: Core idea - shared UTXOs and VTXOs -->
+    <div class="slide">
+        <h2>The Core Idea: Shared UTXOs</h2>
+        <p>Many users <strong>trustlessly share a single on-chain UTXO</strong> using a tree of pre-signed, off-chain transactions.</p>
+        <div class="columns" style="margin-top: 1rem;">
+            <div class="column">
+                <ul>
+                    <li>Your balance is a <span class="secondary">VTXO</span> &mdash; a <strong>Virtual UTXO</strong>.</li>
+                    <li>It behaves like a real UTXO, but lives off-chain.</li>
+                    <li>Backed by pre-signed transactions you can broadcast at any time to claim your bitcoin on-chain.</li>
+                    <li>One on-chain output can hold value for <strong>thousands of users</strong>.</li>
+                </ul>
+            </div>
+            <div class="column">
+                <div class="diagram-box" style="text-align: left; font-size: 1.05rem;">
+On-chain UTXO (shared root)
+        |
+   +----+----+----+
+   |    |    |    |
+ VTXO VTXO VTXO VTXO
+ Alice Bob  Carol Dave
+   |
+ (Alice's pre-signed
+  exit path to L1)
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 5: Inside a VTXO - Taproot -->
+    <div class="slide">
+        <h2>Inside a VTXO: Taproot</h2>
+        <p>A VTXO is just a <strong>Taproot (P2TR) output</strong> &mdash; one key-path for the happy case, hidden script-paths for safety.</p>
+        <div class="columns" style="margin-top: 0.5rem;">
+            <div class="column">
+                <div class="diagram-box" style="text-align: left; font-size: 1.0rem; line-height: 1.35;">
+   Taproot output (VTXO)
+            |
+   +--------+---------+
+   |                  |
+<span style="color:#5b4bdb;">KEY PATH</span>          <span style="color:#ff9900;">SCRIPT PATH</span>
+MuSig2(user,         (tap tree)
+       server)         |
+   |             +-----+-----+
+ cheap,          |           |
+ private      exit       expiry
+ cooperative  (user +    sweep
+ spend        CSV)       (CLTV)
+                </div>
+            </div>
+            <div class="column">
+                <ul>
+                    <li><strong class="secondary">Key path = MuSig2(user + server).</strong> A cooperative spend is a <em>single Schnorr signature</em> &mdash; cheap and indistinguishable from any normal Taproot spend.</li>
+                    <li>Every instant payment / forfeit takes this path. The server can never move funds without your half of the signature.</li>
+                    <li><strong class="accent">Script paths</strong> only get revealed on-chain if cooperation breaks down.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 6: VTXO script paths detail -->
+    <div class="slide">
+        <h2>The Safety Scripts</h2>
+        <p>The hidden tapscript leaves encode "what if the server disappears?" and "what if a VTXO is abandoned?"</p>
+        <pre><code><span style="color:#888;">// Leaf / unilateral EXIT &mdash; relative timelock, user can claim alone</span>
+&lt;userPubKey&gt; OP_CHECKSIGVERIFY
+<span class="code-highlight">&lt;144&gt; OP_CHECKSEQUENCEVERIFY</span>   <span style="color:#888;">// ~1 day delay (CSV)</span>
+
+<span style="color:#888;">// Root / branch EXPIRY &mdash; absolute timelock, server reclaims liquidity</span>
+&lt;serverPubKey&gt; OP_CHECKSIGVERIFY
+<span class="code-highlight">&lt;expiryHeight&gt; OP_CHECKLOCKTIMEVERIFY</span>   <span style="color:#888;">// CLTV, ~28 days</span></code></pre>
+        <div class="info-box" style="max-width: 1000px; margin-top: 1.5rem;">
+            <ul>
+                <li><strong>Relative (CSV)</strong> timelocks gate the user's emergency exit &mdash; you broadcast your branch &amp; leaf, wait the delay, claim on L1.</li>
+                <li><strong>Absolute (CLTV)</strong> timelocks let the server recycle the shared UTXO after a VTXO expires &mdash; which is why you must refresh in time.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Slide 7: How it works - rounds/batches -->
+    <div class="slide">
+        <h2>How It Works: Rounds</h2>
+        <p>The server periodically (e.g. hourly) runs a <strong>round</strong>: it pools requests and commits one transaction tree to the chain.</p>
+        <div class="card" style="margin-top: 1rem; border-color: var(--secondary-color); width: 100%; max-width: 1100px;">
+            <div class="diagram-box" style="text-align: left; font-size: 1rem; line-height: 1.4; padding: 1.5rem; display: inline-block;">
+<strong>User</strong>                           <strong>Ark Server (Operator)</strong>                 <strong>Bitcoin L1</strong>
+  |                                  |                                |
+  | 1. Request VTXO in next round    |                                |
+  | -------------------------------&gt; |                                |
+  |                                  | 2. Build tree, collect sigs    |
+  | 3. Co-sign tree branch           |                                |
+  | &lt;------------------------------&gt; |                                |
+  |                                  | 4. Broadcast ONLY the root tx  |
+  |                                  | -----------------------------&gt; |
+  | 5. Hold VTXO off-chain           |                                |
+  |    (spend instantly, no chain)   |                                |
+            </div>
+            <p style="font-size: 1.15rem; margin-top: 0.5rem;">Between rounds, paying another Ark user is <strong class="secondary">instant</strong> and never touches the chain.</p>
+        </div>
+    </div>
+
+    <!-- Slide 8: Out-of-round payments -->
+    <div class="slide">
+        <h2>Instant Payments: Out-of-Round</h2>
+        <p>You don't wait for a round to pay another Ark user. Between rounds, transfers are <strong class="secondary">instant</strong> and off-chain.</p>
+        <div class="card" style="margin-top: 1rem; border-color: var(--secondary-color); width: 100%; max-width: 1100px;">
+            <div class="diagram-box" style="text-align: left; font-size: 1rem; line-height: 1.4; padding: 1.5rem; display: inline-block;">
+<strong>Alice (sender)</strong>            <strong>Ark Server</strong>              <strong>Bob (receiver)</strong>
+  |                          |                          |
+  | 1. Pay Bob, sign         |                          |
+  |    FORFEIT of my VTXO     |                          |
+  | -----------------------&gt; |                          |
+  |                          | 2. Co-sign a NEW VTXO    |
+  |                          |    for Bob (off-chain)   |
+  |                          | -----------------------&gt; |
+  |                          |                          | 3. Holds spendable
+  |                          |                          |    VTXO instantly
+  |        ... next round folds these VTXOs into the tree ...
+            </div>
+            <p style="font-size: 1.1rem; margin-top: 0.5rem;">Bob's only trust: that Alice won't <strong>collude with the server</strong> to double-spend her forfeited VTXO before the next round settles it &mdash; and he can always <strong>exit on-chain</strong>.</p>
+        </div>
+    </div>
+
+    <!-- Slide 9: Lightning interoperability -->
+    <div class="slide">
+        <h2>Lightning Interoperability</h2>
+        <p>The Ark server doubles as a <strong>Lightning gateway</strong> &mdash; you reach the whole Lightning world without a single channel.</p>
+        <div class="columns" style="margin-top: 1rem;">
+            <div class="column card" style="border-top: 6px solid var(--accent-color);">
+                <h3 class="accent">Receiving &rarr; VTXO</h3>
+                <p>Someone pays your Lightning invoice. The server's node receives the HTLC and credits you a <strong>fresh VTXO</strong>.</p>
+                <div class="diagram-box" style="font-size: 0.95rem;">Lightning payment &rarr; Server &rarr; your VTXO</div>
+            </div>
+            <div class="column card" style="border-top: 6px solid var(--secondary-color);">
+                <h3 class="secondary">Spending &rarr; Lightning</h3>
+                <p>You spend a VTXO; the server pays the external <strong>Lightning invoice</strong> for you, settling atomically via the HTLC preimage.</p>
+                <div class="diagram-box" style="font-size: 0.95rem;">your VTXO &rarr; Server &rarr; Lightning invoice</div>
+            </div>
+        </div>
+        <div class="info-box" style="max-width: 1050px; margin-top: 1.2rem;">
+            No channels, no inbound liquidity, no routing &mdash; the server bridges. The swap is hash-locked (HTLC), so it's atomic: either the Lightning payment settles <em>and</em> your VTXO moves, or neither does.
+        </div>
+    </div>
+
+    <!-- Slide 10: The Operator -->
+    <div class="slide">
+        <h2>The Operator (Ark Server)</h2>
+        <p>A coordinator that makes the whole thing liquid &mdash; but <strong>cannot steal your funds</strong>.</p>
+        <div class="columns" style="margin-top: 1.5rem;">
+            <div class="column card" style="border-top: 6px solid var(--secondary-color);">
+                <h3 class="secondary">What it does</h3>
+                <ul>
+                    <li>Runs rounds &amp; builds transaction trees.</li>
+                    <li>Co-signs and provides liquidity so payments settle instantly.</li>
+                    <li>Acts as a Lightning gateway.</li>
+                </ul>
+            </div>
+            <div class="column card" style="border-top: 6px solid var(--accent-color);">
+                <h3 class="accent">What it can't do</h3>
+                <ul>
+                    <li>Can't move your VTXO without your signature.</li>
+                    <li>Can't stop your <strong>unilateral exit</strong> to L1.</li>
+                    <li>Worst case if it vanishes: you exit on-chain.</li>
+                </ul>
+            </div>
+        </div>
+        <p style="font-size: 1.1rem; color: #999; margin-top: 1.5rem;">Note: "ASP" / "Ark Service Provider" is the older name for the operator.</p>
+    </div>
+
+    <!-- Slide 11: ASP liquidity requirements -->
+    <div class="slide">
+        <h2>The Operator's Liquidity Burden</h2>
+        <p>Ark doesn't delete the liquidity problem &mdash; it <strong>moves it from users to the operator</strong>.</p>
+        <div class="columns" style="margin-top: 1rem;">
+            <div class="column">
+                <h3 class="accent">Why the server fronts capital</h3>
+                <ul>
+                    <li>To mint a <strong>fresh VTXO</strong> (a refresh, a Lightning send, an off-board) the server must put up <strong>on-chain bitcoin now</strong>.</li>
+                    <li>It receives the user's <strong>forfeited</strong> old VTXO &mdash; but can only reclaim that bitcoin <strong>after it expires</strong> (~28 days).</li>
+                    <li>So capital is locked roughly for the <strong>VTXO lifetime</strong>.</li>
+                </ul>
+            </div>
+            <div class="column">
+                <h3 class="secondary">The key inversion</h3>
+                <ul>
+                    <li>An LSP locks capital against each user's <strong>balance</strong>.</li>
+                    <li>An Ark server locks capital against <strong>payment volume / churn</strong> &mdash; <em>not</em> 1:1 against total deposits.</li>
+                    <li>Dynamic fees: cheaper to refresh a near-expiry VTXO, pricier for a fresh long-lived one. Users pay for the time-value of locked capital.</li>
+                </ul>
+            </div>
+        </div>
+        <div class="info-box" style="max-width: 1050px; margin-top: 1.5rem;">
+            <strong>Expiry is what makes the business viable.</strong> Without it, dormant users would lock the operator's capital forever. Second's simulations put Ark at <strong>~3.7&ndash;6.7&times; more capital-efficient</strong> than an LSP (e.g. a DCA stacker: ~32 days of locked liquidity vs ~210 for an LSP).
+        </div>
+    </div>
+
+    <!-- Slide 12: Exit &amp; expiry - the trade-offs -->
+    <div class="slide">
+        <h2>Exit &amp; Expiry: The Fine Print</h2>
+        <div class="columns">
+            <div class="column">
+                <h3 class="secondary">Unilateral Exit</h3>
+                <p>If the server misbehaves or disappears, you broadcast your branch &amp; leaf transactions in sequence to recover funds directly on Bitcoin. <strong>No permission needed.</strong></p>
+            </div>
+            <div class="column">
+                <h3 class="secondary">VTXO Expiry</h3>
+                <p>VTXOs carry a timelock (~28 days). You must <strong>refresh</strong> them in a later round before they expire &mdash; otherwise the server can reclaim that liquidity.</p>
+            </div>
+        </div>
+        <div class="alert-box" style="max-width: 950px; margin-top: 2rem;">
+            <strong>Honest trade-off:</strong> Ark needs you to be <em>interactive</em> (refresh before expiry), and out-of-round payments require trusting the sender not to collude with the operator until the next round settles. You give up some of Lightning's pure peer-to-peer model for radically simpler UX.
+        </div>
+    </div>
+
+    <!-- Slide 13: Today - covenant-less Ark -->
+    <div class="slide">
+        <h2>Today: Covenant-less Ark (clArk)</h2>
+        <p>Bitcoin has <strong>no covenants</strong> yet &mdash; so the tree can't be enforced by script. It's enforced by <strong>signatures</strong> instead.</p>
+        <div class="columns" style="margin-top: 0.5rem;">
+            <div class="column">
+                <h3 class="secondary">How it's held together</h3>
+                <ul>
+                    <li>The VTXO tree is built from <strong>pre-signed transactions</strong>, co-signed <strong>n-of-n (MuSig2)</strong> by all round participants + the server.</li>
+                    <li><strong>Interactive:</strong> you must be <em>online to co-sign</em> when receiving or when your VTXO moves in a round.</li>
+                    <li>You can't (yet) send to an <strong>offline</strong> user or onboard one without their participation.</li>
+                </ul>
+            </div>
+            <div class="column">
+                <h3 class="accent">The statechain-like trust</h3>
+                <ul>
+                    <li>Transfers rely on the sender <strong>forfeiting</strong> their old VTXO and <em>not colluding</em> with the server before the next round settles it.</li>
+                    <li>Like a statechain: a server co-signs and helps enforce single ownership &mdash; security leans on cooperative signing + an honest operator, backstopped by unilateral exit.</li>
+                </ul>
+            </div>
+        </div>
+        <div class="info-box" style="max-width: 1050px; margin-top: 1.2rem;">
+            <strong>Upside:</strong> works on Bitcoin <em>today</em>, no soft fork. <strong>Cost:</strong> interactivity, round coordination, and practical limits on tree size / users per round.
+        </div>
+    </div>
+
+    <!-- Slide 14: Tomorrow - covenant Ark -->
+    <div class="slide">
+        <h2>Tomorrow: Covenant-based Ark</h2>
+        <p>A covenant lets the <strong>output's script commit to the whole tree</strong> &mdash; no all-hands signing session required.</p>
+        <div class="columns" style="margin-top: 0.5rem;">
+            <div class="column">
+                <h3 class="secondary">What <code>CTV</code> changes</h3>
+                <ul>
+                    <li><code>OP_CHECKTEMPLATEVERIFY</code> makes the tree <strong>deterministic &amp; script-enforced</strong> at the root.</li>
+                    <li><strong>Non-interactive:</strong> the server can build the tree alone &mdash; send to <em>offline</em> users, onboard without their input.</li>
+                    <li>Bigger trees &rarr; <strong>more users per round</strong> and better fee efficiency.</li>
+                </ul>
+            </div>
+            <div class="column">
+                <h3 class="accent">The evolutions</h3>
+                <ul>
+                    <li><strong>hArk / Erk</strong> (Steven Roose): use <code>CTV</code> + <code>CSFS</code> to drop user interactivity entirely and allow <strong>offline refresh</strong>.</li>
+                    <li>Needs a Bitcoin <strong>soft fork</strong> (CTV / CSFS aren't activated).</li>
+                    <li><code>bark</code> is built <strong>forward-compatible</strong>: upgrade to native covenants if/when they activate.</li>
+                </ul>
+            </div>
+        </div>
+        <div class="alert-box" style="max-width: 1050px; margin-top: 1.2rem;">
+            <strong>The arc:</strong> statechain-like &amp; interactive <em>today</em> &rarr; covenant-enforced &amp; non-interactive <em>if Bitcoin gains CTV/CSFS</em>. Same VTXO model, far less coordination.
+        </div>
+    </div>
+
+    <!-- Slide 15: Ark vs Lightning -->
+    <div class="slide">
+        <h2>Ark vs. Lightning</h2>
+        <table class="compare">
+            <tr>
+                <th></th>
+                <th class="ark">Ark</th>
+                <th class="ln">Lightning</th>
+            </tr>
+            <tr>
+                <td>Inbound liquidity</td>
+                <td>None needed &mdash; receive instantly</td>
+                <td>Must have inbound capacity</td>
+            </tr>
+            <tr>
+                <td>Onboarding</td>
+                <td>Receive a VTXO, done</td>
+                <td>Open &amp; fund a channel</td>
+            </tr>
+            <tr>
+                <td>Receiving offline</td>
+                <td>Easier (server-mediated)</td>
+                <td>Generally must be online</td>
+            </tr>
+            <tr>
+                <td>Routing failures</td>
+                <td>None &mdash; server is the hub</td>
+                <td>Payments can fail to route</td>
+            </tr>
+            <tr>
+                <td>Interactivity</td>
+                <td>Must refresh VTXOs (~28d)</td>
+                <td>Always-on channels</td>
+            </tr>
+            <tr>
+                <td>Trust model</td>
+                <td>Operator coordinates; you can always exit</td>
+                <td>Peer-to-peer; watchtowers</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Slide 16: Use cases -->
+    <div class="slide">
+        <h2>Use Cases</h2>
+        <div class="columns" style="margin-top: 1rem;">
+            <div class="column card" style="border-top: 6px solid var(--secondary-color);">
+                <h3 class="secondary">Payments</h3>
+                <p>Instant, low-fee wallet-to-wallet transfers with a Lightning on/off ramp &mdash; no channel UX for the user.</p>
+            </div>
+            <div class="column card" style="border-top: 6px solid var(--accent-color);">
+                <h3 class="accent">Assets &amp; Stablecoins</h3>
+                <p>Issue and move Bitcoin-native assets (e.g. stablecoins) off-chain with instant settlement.</p>
+            </div>
+            <div class="column card" style="border-top: 6px solid #4a4a4a;">
+                <h3 style="color: #4a4a4a;">Swaps &amp; Contracts</h3>
+                <p>Atomic swaps across Ark, L1 and Lightning, plus escrows, payment channels and programmable spending conditions.</p>
+            </div>
+        </div>
+        <p style="margin-top: 2rem;">Strong fit for <strong>onboarding many users cheaply</strong> and for apps that need <strong>programmable, instant Bitcoin settlement</strong>.</p>
+    </div>
+
+    <!-- Slide 17: Two implementations -->
+    <div class="slide">
+        <h2>Two Implementations</h2>
+        <p>Same core idea, different emphasis. (Neither is run by the original author, Burak.)</p>
+        <div class="columns" style="margin-top: 1.5rem;">
+            <div class="column card" style="border-top: 6px solid var(--secondary-color);">
+                <h3 class="secondary"><a href="https://second.tech" target="_blank" style="color: inherit; text-decoration: none;">Second</a></h3>
+                <ul>
+                    <li>Focus on <strong>payments &amp; self-custodial wallets</strong>.</li>
+                    <li><code>arkd</code> server + <code>bark</code> wallet.</li>
+                    <li>Closely tracks the core Ark spec: rounds, VTXOs, Lightning gateway.</li>
+                    <li>Goal: a clean, simple Bitcoin payments layer.</li>
+                </ul>
+            </div>
+            <div class="column card" style="border-top: 6px solid var(--accent-color);">
+                <h3 class="accent"><a href="https://arkadeos.com" target="_blank" style="color: inherit; text-decoration: none;">Arkade</a> (Ark Labs)</h3>
+                <ul>
+                    <li>Focus on a <strong>programmable execution layer</strong>.</li>
+                    <li>"Virtual mempool" + batch settlement; SDKs for devs.</li>
+                    <li>Smart contracts, asset issuance, atomic swaps.</li>
+                    <li>Renamed terms: <em>operator</em>, <em>batch swaps</em> (not ASP/rounds).</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 18: Arkade programmability - the language -->
+    <div class="slide">
+        <h2>Inside Arkade: Programmability</h2>
+        <p>Arkade adds a contract language that compiles to <strong>Arkade Script</strong> &mdash; an extended Bitcoin Script that resolves into VTXO Taproot outputs.</p>
+        <div class="columns" style="margin-top: 0.5rem;">
+            <div class="column">
+                <pre style="font-size: 0.95rem;"><code><span style="color:#888;">// high-level, Ivy-like syntax</span>
+contract SingleSig(pubkey user) {
+  function spend(signature s) {
+    require(checkSig(s, user));
+  }
+}</code></pre>
+                <p style="font-size: 1.05rem;">Every function auto-compiles to <strong>two variants</strong>:</p>
+                <ul style="font-size: 1.15rem;">
+                    <li><span class="secondary">Cooperative</span> &rarr; key-path with the operator (instant).</li>
+                    <li><span class="accent">Unilateral exit</span> &rarr; script-path + timelock.</li>
+                </ul>
+                <p style="font-size: 1.0rem; color:#888;">&hellip; the exact Taproot key-path / script-path split from earlier.</p>
+            </div>
+            <div class="column">
+                <h3>Primitives</h3>
+                <ul style="font-size: 1.2rem;">
+                    <li><code>checkSig</code>, <code>checkMultisig</code>, <code>checkSigFromStack</code></li>
+                    <li><code>sha256</code> for HTLC preimages</li>
+                    <li><code>CSV</code> / <code>CLTV</code> timelocks &amp; arithmetic</li>
+                    <li><strong>Transaction introspection</strong> &mdash; read inputs, outputs, values, scriptPubKeys (covenants)</li>
+                    <li><strong>Asset-aware</strong> flows across VTXOs</li>
+                </ul>
+                <p style="font-size: 1.05rem;">Enough to build escrows, HTLC atomic swaps, and Spilman / Poon-Dryja payment channels.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 19: Arkade execution model -->
+    <div class="slide">
+        <h2>Arkade: Execution &amp; Settlement</h2>
+        <div class="columns" style="margin-top: 0.5rem;">
+            <div class="column">
+                <h3 class="accent">Virtual Mempool</h3>
+                <ul>
+                    <li>Off-chain engine where VTXO spends preconfirm <strong>instantly</strong>.</li>
+                    <li>No global state machine or accounts &mdash; just local <em>input &rarr; output</em> transitions per VTXO.</li>
+                    <li>Independent branches run <strong>in parallel</strong>, fully deterministic.</li>
+                </ul>
+            </div>
+            <div class="column">
+                <h3 class="secondary">Batch Settlement</h3>
+                <ul>
+                    <li>Operations finalize on Bitcoin via the <strong>Intent System</strong>.</li>
+                    <li>One on-chain tx anchors <strong>thousands</strong> of off-chain state changes.</li>
+                    <li>Unilateral exit still holds if the operator vanishes.</li>
+                </ul>
+            </div>
+        </div>
+        <div class="alert-box" style="max-width: 1000px; margin-top: 1.5rem;">
+            <strong>Trust note:</strong> contract execution is run by the operator inside a <strong>Trusted Execution Environment (TEE)</strong> and signed by the <strong>Arkade Signer</strong> &mdash; this gives verifiable preconfirmations, but it's a different trust assumption than raw on-chain Bitcoin Script. Self-custody is preserved by the exit path; correctness of preconfirms leans on the TEE.
+        </div>
+    </div>
+
+    <!-- Slide 20: Differences summary -->
+    <div class="slide">
+        <h2>How They Differ</h2>
+        <div class="info-box" style="max-width: 1000px; margin: 1.5rem auto;">
+            <ul>
+                <li><strong>Scope:</strong> Second aims to be the simplest <span class="secondary">Bitcoin payments</span> layer; Arkade aims to be a <span class="accent">programmable application platform</span> on top of the same VTXO mechanics.</li>
+                <li><strong>Audience:</strong> Second targets <strong>wallet users</strong>; Arkade targets <strong>developers</strong> building apps, assets and contracts.</li>
+                <li><strong>Vocabulary:</strong> Arkade rebrands concepts (operator, virtual mempool, batch swaps) and treats its system as distinct from generic "Ark."</li>
+                <li><strong>Common ground:</strong> VTXOs, shared UTXOs, unilateral exit, no consensus changes, Lightning interop.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Slide 21: Conclusion -->
+    <div class="slide">
+        <h1>Ark in One Line</h1>
+        <br>
+        <p style="font-size: 1.6rem; max-width: 950px;">Share a Bitcoin UTXO across many users with pre-signed exits &mdash; get Lightning-like speed with <span class="secondary">no liquidity headaches</span>, while keeping the right to walk away on-chain.</p>
+        <br>
+        <div class="columns">
+            <div class="column center-text">
+                <h3>Learn More</h3>
+                <p><a href="https://second.tech/docs/learn/intro" target="_blank" class="secondary" style="text-decoration: none;">second.tech &mdash; intro</a></p>
+                <p><a href="https://docs.arkadeos.com" target="_blank" class="accent" style="text-decoration: none;">docs.arkadeos.com</a></p>
+            </div>
+            <div class="column center-text">
+                <h3>Dig Deeper</h3>
+                <p><a href="https://bitcoinops.org/en/topics/ark/" target="_blank" style="color: inherit; text-decoration: none;">Bitcoin Optech: Ark</a></p>
+                <p><a href="https://arkdev.info" target="_blank" style="color: inherit; text-decoration: none;">arkdev.info</a></p>
+            </div>
+        </div>
+        <br>
+        <p style="font-size: 1rem; color: #999;">Arrow Keys to Navigate</p>
+    </div>
+
+</div>
+
+<div class="footer">Ark: Scaling Bitcoin with Shared UTXOs</div>
+<div class="controls">Arrow Keys to Navigate</div>
+<div class="progress" id="progress"></div>
+
+<script>
+    // Navigation Logic
+    const slides = document.querySelectorAll('.slide');
+    const progressBar = document.getElementById('progress');
+    let currentSlide = 0;
+
+    function updateSlide() {
+        slides.forEach((slide, index) => {
+            slide.classList.remove('active');
+            if (index === currentSlide) {
+                slide.classList.add('active');
+            }
+        });
+        // Update Progress Bar
+        const progress = ((currentSlide + 1) / slides.length) * 100;
+        progressBar.style.width = `${progress}%`;
+    }
+
+    function nextSlide() {
+        if (currentSlide < slides.length - 1) {
+            currentSlide++;
+            updateSlide();
+        }
+    }
+
+    function prevSlide() {
+        if (currentSlide > 0) {
+            currentSlide--;
+            updateSlide();
+        }
+    }
+
+    // Keyboard Events
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+            nextSlide();
+        } else if (e.key === 'ArrowLeft') {
+            prevSlide();
+        }
+    });
+
+    // Click Events (right side forward, left side back)
+    document.addEventListener('click', (e) => {
+        // Do not change slides if clicking a link
+        if (e.target.tagName.toLowerCase() === 'a' || e.target.closest('a')) {
+            return;
+        }
+
+        if (e.clientX > window.innerWidth / 2) {
+            nextSlide();
+        } else {
+            prevSlide();
+        }
+    });
+
+    // Initialize
+    updateSlide();
+</script>
+
+</body>
+</html>

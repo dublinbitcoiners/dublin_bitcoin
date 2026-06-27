@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ecash & Cashu: Scaling Bitcoin Privacy</title>
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #1a1a1a;
+            --accent-color: #66cc66; /* Cashu Green */
+            --secondary-color: #9f19ff; /* Cashu Purple */
+            --code-bg: #f5f5f5;
+            --slide-padding: 3rem;
+            --slide-max-width: 1400px;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        /* Slide Container */
+        .presentation {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        /* Individual Slide */
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none; /* Hidden by default */
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: var(--slide-padding);
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        .slide.active {
+            display: flex;
+        }
+
+        /* Typography */
+        h1 {
+            font-size: 4rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-color);
+        }
+
+        h2 {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            color: var(--secondary-color);
+        }
+
+        h3 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            color: var(--text-color);
+        }
+
+        p, li {
+            font-size: 1.4rem;
+            line-height: 1.5;
+            color: #4a4a4a;
+            max-width: 1100px;
+        }
+
+        ul {
+            text-align: left;
+            padding-left: 2rem;
+            margin-top: 0;
+        }
+
+        li {
+            margin-bottom: 0.6rem;
+        }
+
+        /* Code Blocks */
+        pre {
+            background-color: var(--code-bg);
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: left;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 1.1rem;
+            overflow-x: auto;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            max-width: 90%;
+        }
+
+        code {
+            font-family: inherit;
+            color: #d63384;
+        }
+
+        pre code {
+            color: #333;
+        }
+
+        /* Custom Classes */
+        .title-slide h1 {
+            font-size: 5rem;
+            color: var(--text-color);
+            margin-bottom: 0.2em;
+        }
+        
+        .title-slide h2 {
+            color: var(--accent-color);
+            font-weight: normal;
+        }
+
+        .accent {
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+
+        .secondary {
+            color: var(--secondary-color);
+            font-weight: bold;
+        }
+
+        .columns {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 3rem;
+            width: 100%;
+            max-width: var(--slide-max-width);
+        }
+
+        .column {
+            flex: 1;
+            text-align: left;
+        }
+        
+        .column h3 {
+            text-align: center;
+        }
+
+        .card {
+            background: #fff;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 1px solid #eee;
+            height: 100%;
+        }
+
+        /* Stack Visual */
+        .stack-box {
+            padding: 1.5rem;
+            margin: 0.5rem 0;
+            border-radius: 8px;
+            font-weight: bold;
+            color: white;
+            font-size: 1.5rem;
+            width: 400px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stack-l3 { background-color: var(--accent-color); }
+        .stack-l2 { background-color: var(--secondary-color); }
+        .stack-l1 { background-color: #ff9900; } /* Bitcoin Orange */
+        .stack-note { font-size: 0.8rem; font-weight: normal; opacity: 0.9; }
+
+        .center-text { text-align: center; }
+
+        .diagram-box {
+            border: 2px dashed #ccc;
+            padding: 1.5rem;
+            border-radius: 8px;
+            background: #fafafa;
+            margin: 1rem 0;
+            font-family: monospace;
+            white-space: pre;
+            text-align: center;
+            font-size: 1.1rem;
+            line-height: 1.3;
+        }
+
+        .alert-box {
+            background-color: #fff3cd;
+            border-left: 6px solid #ffc107;
+            padding: 1rem 2rem;
+            margin: 2rem 0;
+            text-align: left;
+            border-radius: 4px;
+        }
+
+        /* Comparison Table */
+        .comparison-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 1rem;
+        }
+        
+        .comparison-row {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .comparison-cell {
+            flex: 1;
+            padding: 2rem;
+            border-radius: 12px;
+            background: #f9f9f9;
+            border: 1px solid #eee;
+        }
+
+        .comparison-cell.highlight {
+            background: #f0fff0;
+            border-color: var(--accent-color);
+        }
+
+        /* Navigation Controls */
+        .controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            color: #888;
+            background: rgba(255,255,255,0.9);
+            padding: 5px 10px;
+            border-radius: 4px;
+            pointer-events: none;
+        }
+
+        .progress {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            height: 5px;
+            background: var(--accent-color);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* Footer */
+        .footer {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            font-size: 1rem;
+            color: #999;
+            font-family: monospace;
+        }
+
+        .token-circle {
+            background:#eee; 
+            padding:1rem; 
+            border-radius:50%; 
+            width:60px; 
+            height:60px; 
+            display:flex; 
+            align-items:center; 
+            justify-content:center; 
+            font-weight:bold;
+            border: 2px solid #ccc;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="presentation">
+
+    <!-- Slide 1: Title -->
+    <div class="slide title-slide active">
+        <h1>Ecash & Cashu</h1>
+        <h2>Scaling Bitcoin Privacy</h2>
+        <br>
+        <p><strong>thesimplekid</strong></p>
+        <p class="secondary">Cashu Dev Kit Maintainer</p>
+    </div>
+
+    <!-- Slide 2: History -->
+    <div class="slide">
+        <h2>A Brief History</h2>
+        <div class="columns">
+            <div class="column">
+                <h3>David Chaum (1982)</h3>
+                <p>The "Godfather of Privacy"</p>
+                <ul>
+                    <li>Invented <strong>Blind Signatures</strong>.</li>
+                    <li>Goal: Electronic cash that preserves the anonymity of paper cash.</li>
+                    <li><em>"Privacy is necessary for an open society in the electronic age."</em> <br><span style="font-size: 1rem; color: #888;">— Eric Hughes, A Cypherpunk's Manifesto (1993)</span></li>
+                </ul>
+            </div>
+            <div class="column card">
+                <h3>DigiCash (1990-1998)</h3>
+                <p>The first real-world implementation.</p>
+                <div class="alert-box">
+                    <strong>Why did it fail?</strong>
+                    <br><br>
+                    It relied on <strong>Banks</strong> and <strong>Fiat</strong> rails.
+                </div>
+                <p>It was ahead of its time. It needed a settlement layer like <strong>Bitcoin</strong> to truly work.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 3: The Core Difference: Account vs Bearer -->
+    <div class="slide">
+        <h2>Banks vs. Mints</h2>
+        <p>How is data stored?</p>
+        <div class="columns">
+            <div class="column card">
+                <h3>🏛️ Traditional Bank</h3>
+                <p><strong>The "Account" Model</strong></p>
+                <div class="diagram-box">
+ID: Alice
+Balance: $100
+History: 
+- coffee: $5
+- salary: +$200
+                </div>
+                <ul>
+                    <li>Bank knows <strong>who</strong> you are.</li>
+                    <li>Bank knows <strong>how much</strong> you have.</li>
+                    <li>Bank sees <strong>every transaction</strong>.</li>
+                </ul>
+            </div>
+            <div class="column card" style="border: 2px solid var(--accent-color);">
+                <h3>🥜 Cashu Mint</h3>
+                <p><strong>The "Bearer" Model</strong></p>
+                <div class="diagram-box">
+Promissory Notes Issued:
+- Sig_A (Blind): 64 sats
+- Sig_B (Blind): 32 sats
+- Sig_C (Blind): 4 sats
+                </div>
+                <ul>
+                    <li>Mint knows <strong>it issued a token</strong>.</li>
+                    <li>Mint <strong>does not know</strong> who holds it.</li>
+                    <li>Mint <strong>cannot link</strong> issuance to spend.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 3: The Bitcoin Stack -->
+    <div class="slide">
+        <h2>The Bitcoin Stack</h2>
+        <p>Where does Cashu fit?</p>
+        
+        <div style="display: flex; flex-direction: column; align-items: center; margin-top: 2rem;">
+            <div class="stack-box stack-l3">
+                <span>🥜 Cashu</span>
+                <span class="stack-note">Custodial / Private / Instant</span>
+            </div>
+            <div style="font-size: 2rem; color: #ccc;">↓</div>
+            <div class="stack-box stack-l2">
+                <span>⚡ Lightning</span>
+                <span class="stack-note">Trustless / Fast / Online</span>
+            </div>
+            <div style="font-size: 2rem; color: #ccc;">↓</div>
+            <div class="stack-box stack-l1">
+                <span>⛓️ Bitcoin</span>
+                <span class="stack-note">Trustless / Slow / Base Layer</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 4: The Custody Trade-off -->
+    <div class="slide">
+        <h2>The Elephant in the Room</h2>
+        <div class="alert-box">
+            <h3>⚠️ Important Distinction</h3>
+            <p>Cashu is <strong>NOT</strong> a trustless "Layer 3" (like Ark or LN).</p>
+            <p>Cashu is <strong>Chaumian Ecash</strong>, which is fundamentally custodial.</p>
+        </div>
+        
+        <div class="columns">
+            <div class="column">
+                <h3>The Trade-off</h3>
+                <ul>
+                    <li><strong>You Give Up:</strong> Trustlessness (Mint can rug).</li>
+                    <li><strong>You Gain:</strong> Perfect Privacy, Instant Settlement, Offline capabilities.</li>
+                </ul>
+            </div>
+            <div class="column">
+                <h3>Risk Mitigation</h3>
+                <ul>
+                    <li><strong>"Pocket Change":</strong> Only keep what you can afford to lose.</li>
+                    <li><strong>Multi-Mint:</strong> Spread funds across 5-10 mints.</li>
+                    <li><strong>Self-Custody:</strong> Move to L1/LN for long-term storage.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 5: Cashu vs Fedimint -->
+    <div class="slide">
+        <h2>Cashu vs Fedimint</h2>
+        <p>Different trust models, same privacy</p>
+        <div class="columns">
+            <div class="column card">
+                <h3>Fedimint</h3>
+                <p><strong>Federated Custody</strong></p>
+                <ul>
+                    <li>m-of-n threshold guardians.</li>
+                    <li>Distributed trust across parties.</li>
+                    <li>No single point of failure.</li>
+                    <li>Higher operational complexity.</li>
+                    <li><strong>Best for:</strong> Communities with multiple trusted parties.</li>
+                </ul>
+            </div>
+            <div class="column card" style="border: 2px solid var(--accent-color);">
+                <h3>Cashu</h3>
+                <p><strong>Single Operator</strong></p>
+                <ul>
+                    <li>Simple to deploy and run.</li>
+                    <li>Lightweight protocol (NUTs).</li>
+                    <li>Lower barrier for developers.</li>
+                    <li>Easy integration into apps.</li>
+                    <li><strong>Best for:</strong> Apps, personal mints, experimentation.</li>
+                </ul>
+            </div>
+        </div>
+        <div class="card" style="margin-top: 2rem; max-width: 800px; background: #f0fff0; border-color: var(--accent-color);">
+            <p><strong class="accent">They coexist!</strong> Both use blind signatures for the same privacy guarantees. Multi-mint wallets can hold tokens from Cashu mints <em>and</em> Fedimint federations.</p>
+        </div>
+    </div>
+
+    <!-- Slide 6: Cryptography Deep Dive -->
+    <div class="slide">
+        <h2>How It Works: Blind Signatures</h2>
+        <p>The "Carbon Paper Envelope" Analogy</p>
+        <div class="columns">
+            <div class="column">
+                <ol style="font-size: 1.3rem;">
+                    <li><strong>Blind:</strong> Alice puts a random number (token) in a carbon-paper envelope.</li>
+                    <li><strong>Sign:</strong> Alice sends the <em>closed</em> envelope to the Mint. The Mint signs the <em>outside</em>.</li>
+                    <li><strong>Unblind:</strong> Alice gets it back and opens the envelope.</li>
+                    <li><strong>Result:</strong> Alice has the token with the Mint's signature on it.</li>
+                </ol>
+                <p class="secondary" style="margin-top: 2rem;">The Mint signed it, but never saw the number inside!</p>
+            </div>
+            <div class="column">
+                <div class="diagram-box">
+Alice             Mint
+  |                 |
+  | -- Envelope --> |
+  | (M blinded)     |
+  |                 |
+  | <-- Signed ---- |
+  |   Envelope      |
+  |                 |
+(Unblinds to get C) |
+  |                 |
+  | -- Token (C) -> | (Redeem later)
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 6: Anonymity Sets ("Buckets") -->
+    <div class="slide">
+        <h2>Privacy in Numbers: "Buckets"</h2>
+        <p>If everyone requests custom amounts (e.g., "1337 sats"), they are easily trackable.</p>
+        <div class="card">
+            <h3>The Solution: Standard Denominations</h3>
+            <p>Cashu uses powers of two: <code>1, 2, 4, 8, 16, 32...</code></p>
+            <br>
+            <div style="display: flex; gap: 2rem; align-items: center; justify-content: center; margin: 2rem 0;">
+                <div style="text-align: center;">
+                    <p style="font-size: 1rem; color: #888;">Alice mints 13</p>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <span class="token-circle">8</span>
+                        <span class="token-circle">4</span>
+                        <span class="token-circle">1</span>
+                    </div>
+                </div>
+                <div style="font-size: 2rem; color: #ccc;">|</div>
+                <div style="text-align: center;">
+                    <p style="font-size: 1rem; color: #888;">Bob mints 5</p>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <span class="token-circle">4</span>
+                        <span class="token-circle">1</span>
+                    </div>
+                </div>
+            </div>
+            <p>When Alice and Bob spend their <strong>"4"</strong> tokens, the Mint cannot tell them apart.</p>
+            <p class="accent">"Hiding in the crowd"</p>
+        </div>
+    </div>
+
+    <!-- Slide 7: Token Lifecycle (Swap) -->
+    <div class="slide">
+        <h2>The Lifecycle: Sending & Receiving</h2>
+        <p>Since a token is just a text string, how do we prevent Alice from spending it after sending it to Bob?</p>
+        <div class="columns">
+            <div class="column">
+                <h3>1. The Transfer</h3>
+                <p>Alice sends the token (Proof) to Bob via any channel (Signal, Nostr, QR).</p>
+                <div class="alert-box" style="margin-top: 1rem; padding: 1rem;">
+                    <strong>Risk:</strong> Alice still has a copy!
+                </div>
+            </div>
+            <div class="column">
+                <h3>2. The "Swap" (Redemption)</h3>
+                <p>Bob immediately contacts the Mint:</p>
+                <div class="diagram-box" style="text-align: left; padding-left: 2rem;">
+Bob -> Mint: "Here is Token A (Alice's). 
+              Burn it. 
+              Give me Token B (My Secret)."
+
+Mint: "Token A is valid. Burnt.
+       Here is Token B."
+                </div>
+                <p class="accent">Alice's copy is now worthless. Bob has the value.</p>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Slide 8: Multinut Payments -->
+    <div class="slide">
+        <h2>Feature: Multinut Payments</h2>
+        <p><strong>Problem:</strong> You have 500 sats in Mint A and 500 sats in Mint B. You need to pay a 1000 sat invoice.</p>
+        <div class="columns">
+            <div class="column">
+                <h3>The Solution (MPP)</h3>
+                <p>Cashu wallets utilize Lightning <strong>Multi-Path Payments</strong>.</p>
+                <ul>
+                    <li>Mint A pays 500 sats (Part 1).</li>
+                    <li>Mint B pays 500 sats (Part 2).</li>
+                    <li>Receiver gets one unified payment of 1000.</li>
+                </ul>
+                <p class="secondary">This significantly reduces custodial risk by allowing you to fragment your balance.</p>
+            </div>
+            <div class="column">
+                <div class="diagram-box">
+      [Invoice: 1000 sats]
+             /    \
+            /      \
+    [Mint A]      [Mint B]
+   (Pays 500)    (Pays 500)
+            \      /
+             \    /
+        [Lightning Network]
+              |
+        [Receiver Node]
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 8: Use Case: Accountless Apps -->
+    <div class="slide">
+        <h2>Real World: Accountless Apps</h2>
+        <div class="columns">
+            <div class="column">
+                <h3 class="accent">Routstr (AI)</h3>
+                <p>Pay-per-request AI marketplace.</p>
+                <ul>
+                    <li>No API Keys.</li>
+                    <li>No Credit Cards.</li>
+                    <li>Just attach an Ecash token header to your HTTP request.</li>
+                    <li><code>X-Cashu: eyJ...</code></li>
+                </ul>
+            </div>
+            <div class="column">
+                <h3 class="secondary">Hashpool (Mining)</h3>
+                <p>Mining pool shares as Ecash.</p>
+                <ul>
+                    <li>No user accounts.</li>
+                    <li>"eHash" tokens represent work.</li>
+                    <li>Instant, private payouts.</li>
+                    <li>Eliminates minimum payout thresholds.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 9: Use Case: Community Funding -->
+    <div class="slide">
+        <h2>Real World: Chorus</h2>
+        <p><strong>Censorship-Resistant Community Building</strong></p>
+        <div class="card">
+            <div class="columns">
+                <div class="column">
+                    <h3>Nostr + Cashu</h3>
+                    <ul>
+                        <li><strong>Nostr:</strong> Decentralized communication (Identity & Social).</li>
+                        <li><strong>Cashu:</strong> Private funding (Value).</li>
+                    </ul>
+                </div>
+                <div class="column">
+                    <h3>The Benefit</h3>
+                    <p>Communities can organize and raise funds without fear of de-platforming or banking censorship.</p>
+                    <p class="secondary">"Freedom of Speech meets Freedom of Transacting"</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 10: The Expanding Ecosystem -->
+    <div class="slide">
+        <h2>The Expanding Ecosystem</h2>
+        <div class="columns">
+            <div class="column card">
+                <h3 class="accent">Wallets</h3>
+                <ul>
+                    <li><strong>Mobile:</strong> Minibits, eNuts.</li>
+                    <li><strong>iOS:</strong> Macadamia, Sovran.</li>
+                    <li><strong>Web:</strong> Cashu.me, Nutstash.</li>
+                    <li><strong>CLI:</strong> Nutshell.</li>
+                </ul>
+            </div>
+            <div class="column card">
+                <h3 class="secondary">Libraries & Tools</h3>
+                <ul>
+                    <li><strong>Core:</strong> CDK (Rust/Kotlin/Swift), cashu-ts (JS).</li>
+                    <li><strong>Mints:</strong> Nutshell (Python), Mintd (Rust).</li>
+                    <li><strong>Tools:</strong> Cashu.live (Status), Testnut.cashu.space.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 11: Live Demo Setup -->
+    <div class="slide">
+        <h2>Live Demo</h2>
+        <p>Let's look at <strong>Cashu.me</strong> (Web Wallet) and <strong>Nutstash</strong>.</p>
+        <br>
+        <div class="card" style="background: #f9f9f9;">
+            <p><strong>Scenario:</strong></p>
+            <ol style="text-align: left; max-width: 600px; margin: 0 auto;">
+                <li>Create a wallet (no account needed).</li>
+                <li>Mint some tokens via Lightning.</li>
+                <li>Send tokens to a friend via a link (Token passing).</li>
+            </ol>
+        </div>
+    </div>
+
+    <!-- Slide 11: Building on Cashu -->
+    <div class="slide">
+        <h2>Building on Cashu</h2>
+        <p>Cashu Dev Kit (CDK)</p>
+        <pre><code>
+// Rust Example: Minting Tokens
+let mint_url = "https://mint.cashu.space";
+let wallet = Wallet::new(mint_url, currency_unit);
+
+let quote = wallet.mint_quote(Amount::from(1000)).await?;
+// ... pay invoice ...
+let tokens = wallet.mint(&quote.id).await?;
+        </code></pre>
+        <p class="secondary">Available in Rust, Python, TypeScript, Go, Kotlin.</p>
+    </div>
+
+    <!-- Slide 12: Conclusion -->
+    <div class="slide">
+        <h1>Thank You!</h1>
+        <br>
+        <div class="columns">
+            <div class="column center-text">
+                <h3>Learn More</h3>
+                <p><a href="https://cashu.space" class="accent">cashu.space</a></p>
+                <p><a href="https://docs.cashu.space" class="secondary">docs.cashu.space</a></p>
+            </div>
+            <div class="column center-text">
+                <h3>Get Involved</h3>
+                <p>Telegram: @CashuBTC</p>
+                <p>GitHub: cashubtc</p>
+            </div>
+        </div>
+        <br>
+        <p style="font-size: 1rem; color: #999;">Presentation built with HTML/CSS</p>
+    </div>
+
+</div>
+
+<div class="footer">Ecash & Cashu Presentation</div>
+<div class="controls">Arrow Keys to Navigate</div>
+<div class="progress" id="progress"></div>
+
+<script>
+    // Navigation Logic
+    const slides = document.querySelectorAll('.slide');
+    const progressBar = document.getElementById('progress');
+    let currentSlide = 0;
+
+    function updateSlide() {
+        slides.forEach((slide, index) => {
+            slide.classList.remove('active');
+            if (index === currentSlide) {
+                slide.classList.add('active');
+            }
+        });
+        // Update Progress Bar
+        const progress = ((currentSlide + 1) / slides.length) * 100;
+        progressBar.style.width = `${progress}%`;
+    }
+
+    function nextSlide() {
+        if (currentSlide < slides.length - 1) {
+            currentSlide++;
+            updateSlide();
+        }
+    }
+
+    function prevSlide() {
+        if (currentSlide > 0) {
+            currentSlide--;
+            updateSlide();
+        }
+    }
+
+    // Keyboard Events
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+            nextSlide();
+        } else if (e.key === 'ArrowLeft') {
+            prevSlide();
+        }
+    });
+
+    // Click Events (optional, right side forward, left side back)
+    document.addEventListener('click', (e) => {
+        if (e.clientX > window.innerWidth / 2) {
+            nextSlide();
+        } else {
+            prevSlide();
+        }
+    });
+
+    // Initialize
+    updateSlide();
+</script>
+
+</body>
+</html>
